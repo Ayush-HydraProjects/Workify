@@ -25,6 +25,7 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav ml-auto">
                   {% if user.is_authenticated %}
+                    <a href="{% url 'layoff_prediction_form' %}" class="nav-item nav-link">Predict Layoff</a>
                     <a href="{% url 'users-profile' %}" class="nav-item nav-link">Profile</a>
                     <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
                   {% else %}

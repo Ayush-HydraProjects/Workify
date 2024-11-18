@@ -1,0 +1,107 @@
+{% extends "users/base.html" %}
+{% block title %} Layoff Prediction Form - Workify {% endblock title %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const csrftoken = '{{ csrf_token }}';
+</script>
+<div class="form-content my-3 p-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-lg border-0 rounded-lg mt-0 mb-5">
+                    <div class="card-header justify-content-center">
+                        <h3 class="font-weight-light my-4 text-center">Layoff Prediction Form</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="layoff-form" method="POST">
+                            {% csrf_token %}
+                            {% if form.errors %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <div id="form_errors">
+                                        {% for key, value in form.errors.items %}
+                                            <strong>{{ value }}</strong>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Render the form fields dynamically -->
+                            {% for field in form %}
+                                <div class="form-group">
+                                    <label class="small mb-1">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger small">
+                                            {{ field.errors|striptags }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="form-group mt-4 mb-0">
+                                <button type="submit" class="col-md-12 btn btn-dark">Submit</button><br><br>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <div class="small">
+                            <a href="{% url 'users-home' %}">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Handle form submission via JavaScript
+    document.getElementById('layoff-form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+
+        fetch('{% url "layoff_prediction_form" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken, // Add CSRF token for Django
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.prediction) {
+                // Success: Show the prediction result in a popup
+                Swal.fire({
+                    title: 'Layoff Prediction',
+                    text: `There is a ${data.prediction}% chance of layoff.`,
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                });
+            } else {
+                // Error response from server
+                Swal.fire({
+                    title: 'Error',
+                    text: data.error || 'An unexpected error occurred.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                });
+            }
+        })
+        .catch(error => {
+            // Handle unexpected errors
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Could not process your request. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        });
+    });
+</script>
+{% endblock content %}
+

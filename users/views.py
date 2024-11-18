@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.contrib.auth.decorators import login_required
-
-from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm
+from users.layoff_prediction_model.predict import predict
+from django.http import JsonResponse
+from .models import LayoffPrediction
+from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, LayoffPredictionForm
 
 
 def home(request):
@@ -95,3 +97,51 @@ def profile(request):
         profile_form = UpdateProfileForm(instance=request.user.profile)
 
     return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+@login_required
+def layoff_prediction_form(request):
+    prediction_instance = None
+
+    try:
+        prediction_instance = LayoffPrediction.objects.get(user=request.user)
+    except LayoffPrediction.DoesNotExist:
+        pass
+    if request.method == 'POST':
+        form = LayoffPredictionForm(request.POST, instance=prediction_instance)
+        if form.is_valid():
+            prediction = form.save(commit=False)  # Do not save yet
+            prediction.user = request.user       # Assign the logged-in user
+            prediction.save() 
+            data = form.cleaned_data
+            print(data)
+            # Convert to JSON serializable types
+            formatted_data = {
+                'Age': int(data.get('age')),
+                'EducationField': int(data.get('education_field')),
+                'JobRole': int(data.get('job_role')),
+                'Department': int(data.get('department')),
+                'Industry': int(data.get('industry')),
+                'Stage': int(data.get('stage')),
+                'Education': int(data.get('education')),
+                'Funds_Raised(m)': float(data.get('funds_raised')),
+                'PerformanceRating': int(data.get('performance_rating')),
+                'JobSatisfaction': int(data.get('job_satisfaction')),
+                'JobInvolvement': int(data.get('job_involvement')),
+                'YearsAtCompany': int(data.get('years_at_company')),
+                'YearsInCurrentRole': int(data.get('years_in_current_role')),
+                'YearsWithCurrManager': int(data.get('years_with_curr_manager')),
+                'MonthlyIncome': int(data.get('monthly_income')),
+                'NumCompaniesWorked': int(data.get('num_companies_worked')),
+                'Gender': int(data.get('gender')),
+            }
+
+            # Call the prediction function with formatted data
+            prediction = predict(formatted_data)
+            return JsonResponse({'prediction': f"{prediction:.2f}"})
+    else:
+        form = LayoffPredictionForm(instance=prediction_instance)
+    
+    return render(request, 'users/layoff_prediction_form.html', {'form': form})
+
+def success_view(request):
+    return render(request, 'users/success.html')
