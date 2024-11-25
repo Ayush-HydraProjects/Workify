@@ -9,6 +9,13 @@ from users.layoff_prediction_model.predict import predict
 from django.http import JsonResponse
 from .models import LayoffPrediction
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, LayoffPredictionForm
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView
 
 
 def home(request):
@@ -62,6 +69,51 @@ class CustomLoginView(LoginView):
 
         # else browser session will be as long as the session cookie time "SESSION_COOKIE_AGE" defined in settings.py
         return super(CustomLoginView, self).form_valid(form)
+    
+class CustomAdminLoginView(LoginView):
+    form_class = LoginForm
+    template_name = 'users/adminlogin.html'  # Use your custom login template
+
+    # Predefined credentials
+    ADMIN_USERNAME = 'workifyadmin'
+    ADMIN_PASSWORD = 'shivam1001'
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+
+        # Check if the credentials match the predefined ones
+        if username != self.ADMIN_USERNAME or password != self.ADMIN_PASSWORD:
+            form.add_error(None, "Invalid credentials for admin login.")
+            return self.form_invalid(form)
+
+        # Authenticate and log in the user
+        user = authenticate(self.request, username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+
+            self.request.session.set_expiry(0)
+            self.request.session.modified = True
+
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            form.add_error(None, "Invalid credentials.")
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        # Redirect to the admin dashboard or another secure page
+        return reverse_lazy('users-admindashboard')
+
+ 
+class AdminDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/admindashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Fetch all LayoffPrediction data
+        predictions = LayoffPrediction.objects.all()
+        context['predictions'] = predictions
+        return context
 
 
 class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
@@ -108,10 +160,7 @@ def layoff_prediction_form(request):
         pass
     if request.method == 'POST':
         form = LayoffPredictionForm(request.POST, instance=prediction_instance)
-        if form.is_valid():
-            prediction = form.save(commit=False)  # Do not save yet
-            prediction.user = request.user       # Assign the logged-in user
-            prediction.save() 
+        if form.is_valid(): 
             data = form.cleaned_data
             print(data)
             # Convert to JSON serializable types
@@ -137,6 +186,10 @@ def layoff_prediction_form(request):
 
             # Call the prediction function with formatted data
             prediction = predict(formatted_data)
+            formdata = form.save(commit=False)  # Do not save yet
+            formdata.user = request.user       # Assign the logged-in user
+            formdata.prediction_percentage=prediction
+            formdata.save()
             return JsonResponse({'prediction': f"{prediction:.2f}"})
     else:
         form = LayoffPredictionForm(instance=prediction_instance)
