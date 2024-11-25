@@ -90,7 +90,7 @@ class UpdateProfileForm(forms.ModelForm):
 class LayoffPredictionForm(forms.ModelForm):
     class Meta:
         model = LayoffPrediction
-        exclude = ['user']
+        exclude = ['user','prediction_percentage']
         fields = '__all__'
         widgets = {
             'age': forms.NumberInput(attrs={'class': 'form-control'}),

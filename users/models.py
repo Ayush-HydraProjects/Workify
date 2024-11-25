@@ -99,6 +99,7 @@ class LayoffPrediction(models.Model):
     years_with_curr_manager = models.IntegerField()
     monthly_income = models.IntegerField()
     num_companies_worked = models.IntegerField()
+    prediction_percentage = models.FloatField()
     gender = models.IntegerField(choices=[
         (0, "Male"),
         (1, "Female"),
