@@ -87,7 +87,6 @@
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-
     document.getElementById('layoff-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -115,25 +114,42 @@
                 }
 
                 let recommendations = '';
-                data.recommendations.forEach(function(rec) {
-                    recommendations += `
-                        <div class="p-3 mb-2" style="background-color: #d4edda; border-left: 5px solid #28a745; border-radius: 5px;">
-                            <span style="color: #28a745; font-size: 1.1rem;">${rec}</span>
+                if (data.recommendations && data.recommendations.length > 0) {
+                    data.recommendations.forEach(function(rec) {
+                        recommendations += `
+                            <div class="p-3 mb-2" style="background-color: #d4edda; border-left: 5px solid #28a745; border-radius: 5px;">
+                                <span style="color: #28a745; font-size: 1.1rem;">${rec}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    recommendations = `
+                        <div class="p-3 mb-2" style="background-color: #f8d7da; border-left: 5px solid #dc3545; border-radius: 5px;">
+                            <span style="color: #dc3545; font-size: 1.1rem;">No recommendations available at this time.</span>
                         </div>
                     `;
-                });
+                }
 
                 Swal.fire({
                     title: '🔮 Layoff Prediction',
                     html: `
-                        <div>
-                            <p><strong>🚨 Prediction:</strong> <span style="font-size: 1.6rem; font-weight: bold; color: #dc3545;">${data.prediction}%</span> chance of layoff</p>
-                            <hr>
-                            <p><strong>📊 Feature Importance:</strong></p>
-                            ${featureImportance}
-                            <hr>
-                            <p><strong>💡 Recommendations:</strong></p>
-                            ${recommendations}
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                            <!-- Left Column: Prediction and Feature Importance -->
+                            <div style="flex: 1; min-width: 250px;">
+                                <p><strong>🚨 Prediction:</strong></p>
+                                <p style="font-size: 2rem; font-weight: bold; color: #dc3545;">
+                                    ${data.prediction}% chance of layoff
+                                </p>
+                                <hr>
+                                <p><strong>📊 Feature Importance:</strong></p>
+                                ${featureImportance}
+                            </div>
+                            
+                            <!-- Right Column: Recommendations -->
+                            <div style="flex: 1; min-width: 250px;">
+                                <p><strong>💡 Recommendations:</strong></p>
+                                ${recommendations}
+                            </div>
                         </div>
                     `,
                     icon: 'info',
@@ -169,5 +185,6 @@
             });
         });
     });
+
 </script>
 {% endblock content %}
