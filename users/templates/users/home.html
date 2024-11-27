@@ -20,9 +20,12 @@
                         <a class="btn btn-primary btn-lg mx-2 shadow-sm" href="{% url 'layoff_prediction_form' %}" role="button">
                             <i class="fas fa-chart-line"></i> Predict your Layoff
                         </a>
-                        <a class="btn btn-danger btn-lg mx-2 shadow-sm" href="{% url 'logout' %}" role="button">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
+                        <form method="post" action="{% url 'logout' %}" class="ml-3">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg px-4 py-2">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </form>
                     {% else %}
                         <a class="btn btn-success btn-lg mx-2 shadow-sm" href="{% url 'login' %}" role="button">
                             <i class="fas fa-user"></i> Sign in

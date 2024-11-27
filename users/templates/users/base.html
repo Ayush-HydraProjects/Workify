@@ -64,7 +64,12 @@
                             <a href="{% url 'users-profile' %}" class="nav-link text-dark">Profile</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'logout' %}" class="nav-link text-dark">Logout</a>
+                               <form method="post" action="{% url 'logout' %}" class="nav-link text-dark">
+                                {% csrf_token %}
+                                <button type="submit" class="ml-3">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
                         </li>
                     {% else %}
                         <li class="nav-item">
