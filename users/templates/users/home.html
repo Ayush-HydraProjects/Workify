@@ -1,21 +1,110 @@
 {% extends "users/base.html" %}
-{% block title %} Home Page {% endblock title%}
+{% block title %} Home Page {% endblock title %}
 {% block content %}
-    <div class="jumbotron">
-        <h1 class="display-4">Welcome to Workify</h1>
-        <p class="lead">
-            Workify empowers you to navigate career stability with confidence. Our predictive insights reveal job security risks, helping you make informed choices for a resilient future—because in an unpredictable world, knowledge is your strongest ally.
-        </p>
-        <hr class="my-4">
-        <p class="lead">
-            {% if user.is_authenticated %}
-                <a class="btn btn-primary btn-lg" href="{% url 'layoff_prediction_form' %}" role="button">Predict your Layoff</a>
-                <a class="btn btn-primary btn-lg" href="{% url 'logout' %}" role="button">Logout</a>
-            {% else %}
-                <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Sign in</a>
-                <a class="btn btn-primary btn-lg" href="{% url 'adminlogin' %}" role="button">Sign in as Admin</a>
-            {% endif %}
-        </p>
+<!-- Main Content -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+            <div class="jumbotron bg-light p-5 rounded shadow-lg">
+                <!-- Hero Section -->
+                <h1 class="display-4 font-weight-bold text-primary">Welcome to <span class="text-dark">Workify</span></h1>
+                <p class="lead mt-3">
+                    Workify empowers you to navigate career stability with confidence. Our predictive insights reveal 
+                    job security risks, helping you make informed choices for a resilient future—because in an unpredictable world, 
+                    <strong>knowledge is your strongest ally.</strong>
+                </p>
+                <hr class="my-4">
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-center mt-4">
+                    {% if user.is_authenticated %}
+                        <a class="btn btn-primary btn-lg mx-2 shadow-sm" href="{% url 'layoff_prediction_form' %}" role="button">
+                            <i class="fas fa-chart-line"></i> Predict your Layoff
+                        </a>
+                        <a class="btn btn-danger btn-lg mx-2 shadow-sm" href="{% url 'logout' %}" role="button">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    {% else %}
+                        <a class="btn btn-success btn-lg mx-2 shadow-sm" href="{% url 'login' %}" role="button">
+                            <i class="fas fa-user"></i> Sign in
+                        </a>
+                        <a class="btn btn-info btn-lg mx-2 shadow-sm" href="{% url 'adminlogin' %}" role="button">
+                            <i class="fas fa-user-shield"></i> Sign in as Admin
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
+<!-- Features Section -->
+<div class="row mt-5">
+    <div class="col-md-4 text-center">
+        <div class="card border-0 shadow-sm p-4">
+            <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
+            <h5 class="font-weight-bold">Data-Driven Insights</h5>
+            <p class="text-muted">
+                Get accurate, AI-powered predictions to make the best career decisions.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="card border-0 shadow-sm p-4">
+            <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+            <h5 class="font-weight-bold">Secure and Private</h5>
+            <p class="text-muted">
+                Your data is handled with utmost security and confidentiality.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="card border-0 shadow-sm p-4">
+            <i class="fas fa-users fa-3x text-primary mb-3"></i>
+            <h5 class="font-weight-bold">For Everyone</h5>
+            <p class="text-muted">
+                Designed for employees, HR professionals, and business leaders alike.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="row mt-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="text-primary font-weight-bold">Global Layoff Insights</h2>
+                <p class="text-muted">Recent layoff trends reshaping industries worldwide</p>
+            </div>
+
+            <div id="layoffNewsCarousel" class="carousel slide position-relative" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    {% for index in articles %}
+                        <button type="button" data-bs-target="#layoffNewsCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %} active {% endif %}" aria-current="true" aria-label="Slide {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            {% for article in articles|slice:":10" %}
+                                <div class="col-md-4 mb-4">
+                                    <!-- Link to the article -->
+                                    <a href="{{ article.url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                        <div class="card border-0 shadow-sm">
+                                            <!-- Image from the article -->
+                                            <img class="card-img-top img-fluid" src="{% if article.urlToImage %}{{ article.urlToImage }}{% endif %}" alt="{{ article.title }}" style="height: 250px; object-fit: cover;">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title font-weight-bold text-primary">{{ article.title }}</h5>
+                                                <p class="card-text text-muted">{{ article.description }}</p>
+                                                <small class="text-muted">Published: {{ article.publishedAt|date:"F j, Y" }}</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 {% endblock content %}

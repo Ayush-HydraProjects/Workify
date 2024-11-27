@@ -16,10 +16,23 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+import requests
 
 
 def home(request):
-    return render(request, 'users/home.html')
+    # Example: Fetching news data from a public API (NewsAPI)
+    api_key = '3990d862d59f4135a4fe98c8e02bea7b'
+    url = f'https://newsapi.org/v2/everything?q=layoff&apiKey={api_key}'
+    response = requests.get(url)
+    
+    # Check if the response is valid
+    if response.status_code == 200:
+        articles = response.json().get('articles', [])
+    else:
+        articles = []  # If API fails, show no articles
+
+    return render(request, 'users/home.html', {'articles': articles})
+
 
 
 class RegisterView(View):
@@ -198,3 +211,4 @@ def layoff_prediction_form(request):
 
 def success_view(request):
     return render(request, 'users/success.html')
+

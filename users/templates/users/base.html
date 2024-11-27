@@ -7,57 +7,112 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- In base.html -->
+<head>
+  <!-- Ensure Bootstrap and Font Awesome are included here -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</head>
 
-    <!--Font awesome icons -->
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMfeQf0ygfjkSmwxLv1zW+eJktjySLc8E+2Fwv" crossorigin="anonymous">
 
-    <title>{% block title %} {% endblock %} </title>
+    <title>{% block title %} Workify {% endblock %}</title>
+    
+    <!-- Custom CSS for Styling -->
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+        }
+        .navbar-light {
+            background-color: #f0f5f5 !important;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-item a:hover {
+            color: #007bff !important;
+        }
+    </style>
 </head>
 <body>
-  <div class="container p-3 my-3">
-    <div class="row">
-      <div class="col-md-12">
-        <nav class="navbar navbar-expand-md navbar-light " style="background-color: #f0f5f5">
-          <a href="/" class="navbar-brand">Home</a>
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md navbar-light">
+        <div class="container-fluid">
+            <a href="/" class="navbar-brand text-primary">Workify</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ml-auto">
-                  {% if user.is_authenticated %}
-                    <a href="{% url 'layoff_prediction_form' %}" class="nav-item nav-link">Predict Layoff</a>
-                    <a href="{% url 'users-profile' %}" class="nav-item nav-link">Profile</a>
-                    <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
-                  {% else %}
-                    <a href="{% url 'login' %}" class="nav-item nav-link">Sign in</a>
-                  {% endif %}
-
-                </div>
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a href="{% url 'layoff_prediction_form' %}" class="nav-link text-dark">Predict Layoff</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'users-profile' %}" class="nav-link text-dark">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'logout' %}" class="nav-link text-dark">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="{% url 'login' %}" class="nav-link text-dark">Sign in</a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
-        <!--Any flash messages pop up in any page because this is the base template-->
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
         {% if messages %}
-          <div class="alert alert-dismissible" role="alert">
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
+            <div class="alert alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         {% endif %}
-        {% block content %}{% endblock %}
-      </div>
     </div>
-  </div>
 
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
 
-    <!-- A plugin for password show/hide  -->
+    <!-- Footer -->
+    <footer class="py-4">
+        <div class="container text-center">
+            <p class="mb-1">&copy; {{ now.year }} Workify. All rights reserved.</p>
+            <div>
+                <a href="#" class="text-light mx-2">Privacy Policy</a> |
+                <a href="#" class="text-light mx-2">Terms of Service</a> |
+                <a href="#" class="text-light mx-2">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRkZtbfnF8GO9uH/JGepFD4NQYZ+7tXUsE6Xg9A5R" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-KsvkXtsIlozPCDB6w5wlj6qiNSr2OkaQOjCN2WzGx9KA6F6b6/kODbUOLb+Az4Zk" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.0/js/bootstrap.min.js" integrity="sha384-wEmeIV1mKuiNpHRE3sUoi6zYCnIWp3sosn6Zx5khKnk2z2DCItSrHMbN68J2cXg+" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap Show Password -->
     <script src="https://unpkg.com/bootstrap-show-password@1.2.1/dist/bootstrap-show-password.min.js"></script>
-
 </body>
 </html>

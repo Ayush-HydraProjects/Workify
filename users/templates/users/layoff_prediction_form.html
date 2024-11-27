@@ -2,79 +2,84 @@
 {% block title %} Layoff Prediction Form - Workify {% endblock title %}
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    const csrftoken = '{{ csrf_token }}';
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
 <div class="form-content my-3 p-3">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-7">
-                <div class="card shadow-lg border-0 rounded-lg mt-0 mb-5">
-                    <div class="card-header justify-content-center">
-                        <h3 class="font-weight-light my-4 text-center">Predict your chances of Layoff</h3>
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded-lg mt-3 mb-5">
+                    <div class="card-header text-center">
+                        <h3 class="font-weight-bold">Predict Your Layoff Risk</h3>
+                        <p class="text-muted">Fill out the form to get a prediction</p>
                     </div>
                     <div class="card-body">
                         <form id="layoff-form" method="POST">
                             {% csrf_token %}
-                            {% if form.errors %}
-                                <div class="alert alert-danger alert-dismissible" role="alert">
-                                    <div id="form_errors">
-                                        {% for key, value in form.errors.items %}
-                                            <strong>{{ value }}</strong>
-                                        {% endfor %}
-                                    </div>
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            {% endif %}
-                            
-                            <!-- Render the form fields dynamically -->
+                            <!-- Enhanced Form Fields -->
                             {% for field in form %}
-                                <div class="form-group">
-                                    <label class="small mb-1">{{ field.label }}</label>
+                                <div class="form-group position-relative mb-3">
+                                    <label class="form-label font-weight-bold d-flex align-items-center">
+                                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                                        {{ field.label }}
+                                        {% if field.help_text %}
+                                            <span 
+                                                class="ms-1 text-muted" 
+                                                data-bs-toggle="tooltip" 
+                                                title="{{ field.help_text }}">
+                                                <i class="fas fa-question-circle"></i>
+                                            </span>
+                                        {% endif %}
+                                    </label>
                                     {{ field }}
                                     {% if field.errors %}
-                                        <div class="text-danger small">
-                                            {{ field.errors|striptags }}
-                                        </div>
+                                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
                                     {% endif %}
                                 </div>
                             {% endfor %}
                             
-                            <div class="form-group mt-4 mb-0">
-                                <button type="submit" class="col-md-12 btn btn-dark">Submit</button><br><br>
+                            <!-- Submit Button -->
+                            <div class="form-group mt-4">
+                                <button type="submit" class="btn btn-dark btn-lg w-100 shadow-sm">
+                                    <i class="fas fa-chart-line"></i> Submit Prediction
+                                </button>
                             </div>
                         </form>
                     </div>
                     <div class="card-footer text-center">
-                        <div class="small">
-                            <a href="{% url 'users-home' %}">Back to Home</a>
-                        </div>
+                        <a href="{% url 'users-home' %}" class="btn btn-link text-decoration-none">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    // Handle form submission via JavaScript
-    document.getElementById('layoff-form').addEventListener('submit', function (e) {
-        e.preventDefault(); // Prevent default form submission
 
+<script>
+    // Activate Bootstrap Tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Form Submission Handler
+    document.getElementById('layoff-form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent default submission
         const formData = new FormData(this);
 
         fetch('{% url "layoff_prediction_form" %}', {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': csrftoken, // Add CSRF token for Django
+                'X-CSRFToken': '{{ csrf_token }}',
             },
         })
         .then(response => response.json())
         .then(data => {
             if (data.prediction) {
-                // Success: Show the prediction result in a popup
                 Swal.fire({
                     title: 'Layoff Prediction',
                     text: `There is a ${data.prediction}% chance of layoff.`,
@@ -82,7 +87,6 @@
                     confirmButtonText: 'OK',
                 });
             } else {
-                // Error response from server
                 Swal.fire({
                     title: 'Error',
                     text: data.error || 'An unexpected error occurred.',
@@ -92,8 +96,6 @@
             }
         })
         .catch(error => {
-            // Handle unexpected errors
-            console.error('Error:', error);
             Swal.fire({
                 title: 'Error',
                 text: 'Could not process your request. Please try again.',
@@ -104,4 +106,3 @@
     });
 </script>
 {% endblock content %}
-

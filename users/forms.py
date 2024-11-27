@@ -90,7 +90,7 @@ class UpdateProfileForm(forms.ModelForm):
 class LayoffPredictionForm(forms.ModelForm):
     class Meta:
         model = LayoffPrediction
-        exclude = ['user','prediction_percentage']
+        exclude = ['user', 'prediction_percentage']
         fields = '__all__'
         widgets = {
             'age': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -115,3 +115,11 @@ class LayoffPredictionForm(forms.ModelForm):
                 (2, "Other")
             ]),
         }
+        help_texts = {
+            'education': "1: Below College | 2: College | 3: Bachelor | 4: Master | 5: Doctor",
+            'performance_rating': "1: Low | 2: Good | 3: Excellent | 4: Outstanding",
+            'job_satisfaction': "1: Low | 2: Medium | 3: High | 4: Very High",
+            'job_involvement': "1: Low | 2: Medium | 3: High | 4: Very High",
+            'gender': "Select your gender identity.",
+        }
+
