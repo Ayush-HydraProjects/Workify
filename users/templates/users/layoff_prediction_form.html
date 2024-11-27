@@ -5,6 +5,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
+<style>
+    .swal-wide {
+        width: 70vw; 
+        max-width: 100%;
+    }
+
+    .swal-wide .swal2-html-container {
+        overflow-y: auto; 
+    }
+
+    .swal-wide .swal2-title {
+        font-size: 1.5rem; 
+        font-weight: bold;
+    }
+
+    .swal-wide .swal2-content {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .swal-wide .swal2-confirm {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+</style>
+
 <div class="form-content my-3 p-3">
     <div class="container">
         <div class="row justify-content-center">
@@ -17,7 +43,6 @@
                     <div class="card-body">
                         <form id="layoff-form" method="POST">
                             {% csrf_token %}
-                            <!-- Enhanced Form Fields -->
                             {% for field in form %}
                                 <div class="form-group position-relative mb-3">
                                     <label class="form-label font-weight-bold d-flex align-items-center">
@@ -39,7 +64,6 @@
                                 </div>
                             {% endfor %}
                             
-                            <!-- Submit Button -->
                             <div class="form-group mt-4">
                                 <button type="submit" class="btn btn-dark btn-lg w-100 shadow-sm">
                                     <i class="fas fa-chart-line"></i> Submit Prediction
@@ -59,15 +83,13 @@
 </div>
 
 <script>
-    // Activate Bootstrap Tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Form Submission Handler
     document.getElementById('layoff-form').addEventListener('submit', function (e) {
-        e.preventDefault(); // Prevent default submission
+        e.preventDefault();
         const formData = new FormData(this);
 
         fetch('{% url "layoff_prediction_form" %}', {
@@ -80,27 +102,70 @@
         .then(response => response.json())
         .then(data => {
             if (data.prediction) {
+                let featureImportance = '';
+                for (let key in data.feature_importance) {
+                    if (data.feature_importance.hasOwnProperty(key)) {
+                        featureImportance += `
+                            <div class="d-flex justify-content-between p-2 mb-2" style="background-color: #f8f9fa; border-radius: 5px;">
+                                <strong>${key}:</strong>
+                                <span style="color: #007bff;">${data.feature_importance[key]}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                let recommendations = '';
+                data.recommendations.forEach(function(rec) {
+                    recommendations += `
+                        <div class="p-3 mb-2" style="background-color: #d4edda; border-left: 5px solid #28a745; border-radius: 5px;">
+                            <span style="color: #28a745; font-size: 1.1rem;">${rec}</span>
+                        </div>
+                    `;
+                });
+
                 Swal.fire({
-                    title: 'Layoff Prediction',
-                    text: `There is a ${data.prediction}% chance of layoff.`,
+                    title: '🔮 Layoff Prediction',
+                    html: `
+                        <div>
+                            <p><strong>🚨 Prediction:</strong> <span style="font-size: 1.6rem; font-weight: bold; color: #dc3545;">${data.prediction}%</span> chance of layoff</p>
+                            <hr>
+                            <p><strong>📊 Feature Importance:</strong></p>
+                            ${featureImportance}
+                            <hr>
+                            <p><strong>💡 Recommendations:</strong></p>
+                            ${recommendations}
+                        </div>
+                    `,
                     icon: 'info',
-                    confirmButtonText: 'OK',
+                    showCancelButton: false,
+                    confirmButtonText: 'Got it! 👍',
+                    confirmButtonColor: '#17a2b8',
+                    background: '#f8f9fa',
+                    customClass: {
+                        popup: 'swal-wide',
+                        title: 'text-primary',
+                        content: 'text-dark'
+                    }
                 });
             } else {
                 Swal.fire({
-                    title: 'Error',
-                    text: data.error || 'An unexpected error occurred.',
+                    title: 'Error 🚨',
+                    text: data.error || 'An unexpected error occurred. Please try again later.',
                     icon: 'error',
                     confirmButtonText: 'OK',
+                    confirmButtonColor: '#dc3545',
+                    background: '#f8d7da',
                 });
             }
         })
         .catch(error => {
             Swal.fire({
-                title: 'Error',
+                title: 'Error 🚨',
                 text: 'Could not process your request. Please try again.',
                 icon: 'error',
                 confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545',
+                background: '#f8d7da',
             });
         });
     });
