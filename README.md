@@ -1,3 +1,4 @@
+
 # Workify - User Profile Management System
 
 Workify is a web-based platform that allows users to manage their profiles, update personal details, and change their avatars and bios. The system is designed with ease of use in mind and features a clean, modern interface that enhances user experience.
@@ -162,3 +163,4 @@ Acknowledgements
 *   [Django](https://www.djangoproject.com/) - The web framework used for this project.
 *   [Bootstrap](https://getbootstrap.com/) - Frontend framework for responsive design.
 *   [Font Awesome](https://fontawesome.com/) - Icons used for UI.
+41f29da5b7b47e65abd5ce2748def81862b73e1e

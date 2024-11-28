@@ -5,9 +5,9 @@ import json
 
 def predict(data):
     # Load the model, scaler, and RFE
-    model_filename = r'/Users/ayushparekh/Documents/IA:DS/Workify/Workify/users/layoff_prediction_model/RF_MODEL.pkl'
-    scaler_filename = r'/Users/ayushparekh/Documents/IA:DS/Workify/Workify/users/layoff_prediction_model/scaler.pkl'
-    rfe_filename = r'/Users/ayushparekh/Documents/IA:DS/Workify/Workify/users/layoff_prediction_model/RFE.pkl'
+    model_filename = r'users/layoff_prediction_model/RF_MODEL.pkl'
+    scaler_filename = r'users/layoff_prediction_model/scaler.pkl'
+    rfe_filename = r'users/layoff_prediction_model/RFE.pkl'
 
     loaded_model = joblib.load(model_filename)
     loaded_scaler = joblib.load(scaler_filename)

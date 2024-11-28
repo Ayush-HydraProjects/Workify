@@ -4,6 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
     .swal-wide {
@@ -87,6 +88,7 @@
     const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
     document.getElementById('layoff-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -101,15 +103,17 @@
         .then(response => response.json())
         .then(data => {
             if (data.prediction) {
-                let featureImportance = '';
+
+                let chartData = {
+                    labels: [],
+                    data: []
+                };
+
+                // Prepare the feature importance data for the chart
                 for (let key in data.feature_importance) {
                     if (data.feature_importance.hasOwnProperty(key)) {
-                        featureImportance += `
-                            <div class="d-flex justify-content-between p-2 mb-2" style="background-color: #f8f9fa; border-radius: 5px;">
-                                <strong>${key}:</strong>
-                                <span style="color: #007bff;">${data.feature_importance[key]}</span>
-                            </div>
-                        `;
+                        chartData.labels.push(key);
+                        chartData.data.push(data.feature_importance[key]);
                     }
                 }
 
@@ -129,7 +133,6 @@
                         </div>
                     `;
                 }
-
                 Swal.fire({
                     title: '🔮 Layoff Prediction',
                     html: `
@@ -142,7 +145,7 @@
                                 </p>
                                 <hr>
                                 <p><strong>📊 Feature Importance:</strong></p>
-                                ${featureImportance}
+                                <canvas id="featureChart" width="400" height="300"></canvas>
                             </div>
                             
                             <!-- Right Column: Recommendations -->
@@ -161,6 +164,80 @@
                         popup: 'swal-wide',  // Use the wide pop-up class
                         title: 'text-primary',
                         content: 'text-dark'
+                    },
+                    didOpen: () => {
+                        // Create the chart once the modal is opened
+                        const ctx = document.getElementById('featureChart').getContext('2d');
+
+                        // Define a color scale for the bars (color coding based on importance value)
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, '#0D6EFD'); // Blue for high importance
+                        gradient.addColorStop(0.5, '#0D6EFD'); // Red for low importance
+                        gradient.addColorStop(1, '#0D6EFD'); // Red for low importanc
+
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: chartData.labels, // Labels from the feature importance
+                                datasets: [{
+                                    label: 'Feature Importance',
+                                    data: chartData.data, // Values of the feature importance
+                                    backgroundColor: function(context) {
+                                        // Color the bars based on the value of feature importance
+                                        const value = context.raw;
+                                        if (value > 0.2) {
+                                            return '#0D6EFD'; // Blue for higher importance
+                                        } else {
+                                            return '#0D6EFD'; // Red for lower importance
+                                        }
+                                    },
+                                    borderColor: 'rgba(0, 123, 255, 1)', // Dark blue border for all bars
+                                    borderWidth: 1,
+                                    barThickness: 20,
+                                    hoverBackgroundColor: gradient, // Hover effect
+                                    hoverBorderWidth: 2,
+                                    hoverBorderColor: 'black'
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y', // This will make the chart horizontal
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            precision: 1
+                                        },
+                                        grid: {
+                                            display: true,
+                                            color: '#ccc'
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            display: false
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false // Hide the legend as it's not needed for this case
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(tooltipItem) {
+                                                return tooltipItem.dataset.label + ': ' + tooltipItem.raw.toFixed(2); // Show percentage with 2 decimals
+                                            }
+                                        }
+                                    }
+                                },
+                                animation: {
+                                    easing: 'easeInOutQuad',
+                                    duration: 1000 // Smooth animation for bar rendering
+                                }
+                            }
+                        });
                     }
                 });
             } else {
