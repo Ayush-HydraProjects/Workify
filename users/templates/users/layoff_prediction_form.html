@@ -6,7 +6,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
 <style>
     .swal-wide {
         width: 70vw; 
@@ -104,6 +103,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.prediction) {
+
                 let chartData = {
                     labels: [],
                     data: []
@@ -133,8 +133,6 @@
                         </div>
                     `;
                 }
-
-                // Render the prediction modal with chart
                 Swal.fire({
                     title: '🔮 Layoff Prediction',
                     html: `
@@ -264,6 +262,6 @@
             });
         });
     });
-</script>
 
+</script>
 {% endblock content %}
