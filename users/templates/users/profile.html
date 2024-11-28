@@ -2,9 +2,12 @@
 {% block title %}Profile Page{% endblock title %}
 {% block content %}
     <!-- Profile Image Section -->
-    <div class="row my-3 justify-content-center">
+    <div class="row my-5 justify-content-center">
         <div class="col-md-4 text-center">
-            <img class="rounded-circle account-img mb-3" src="{{ user.profile.avatar.url }}" style="cursor: pointer; width: 150px; height: 150px; object-fit: cover;" />
+            <img class="rounded-circle account-img mb-3" src="{{ user.profile.avatar.url }}" 
+                 style="cursor: pointer; width: 150px; height: 150px; object-fit: cover; transition: transform 0.3s ease, box-shadow 0.3s ease;" 
+                 alt="Profile Image" 
+                 title="Click to change avatar" />
             <h5 class="text-muted">{{ user.username }}</h5>
         </div>
     </div>
@@ -28,7 +31,7 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-row">
-                <div class="col-md-6 offset-md-3">
+                <div class="col-md-8 offset-md-2">
                     <!-- Username -->
                     <div class="form-group">
                         <label for="username" class="small mb-1">Username:</label>
@@ -43,7 +46,7 @@
 
                     <!-- Change Password Link -->
                     <div class="form-group text-center">
-                        <a href="{% url 'password_change' %}" class="small">Change Password</a>
+                        <a href="{% url 'password_change' %}" class="small text-primary">Change Password</a>
                     </div>
 
                     <hr>
@@ -62,11 +65,30 @@
 
                     <!-- Save and Reset Buttons -->
                     <div class="form-group text-center">
-                        <button type="submit" class="btn btn-dark btn-lg btn-block">Save Changes</button>
-                        <button type="reset" class="btn btn-secondary btn-lg btn-block">Reset</button>
+                        <button type="submit" class="btn btn-primary btn-lg btn-block mb-3" style="transition: transform 0.3s ease, background-color 0.3s ease;">
+                            Save Changes
+                        </button>
+                        <button type="reset" class="btn btn-secondary btn-lg btn-block" style="transition: transform 0.3s ease, background-color 0.3s ease;">
+                            Reset
+                        </button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
+
+    <!-- Extra JS for avatar hover effect -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarImg = document.querySelector('.account-img');
+            avatarImg.addEventListener('mouseover', function() {
+                avatarImg.style.transform = 'scale(1.1)';
+                avatarImg.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+            });
+            avatarImg.addEventListener('mouseout', function() {
+                avatarImg.style.transform = 'scale(1)';
+                avatarImg.style.boxShadow = 'none';
+            });
+        });
+    </script>
 {% endblock content %}
