@@ -90,7 +90,7 @@ def predict(data):
         advice.append("A shorter tenure with low performance might require extra effort to prove your value. Consider additional responsibilities or training to improve your standing.")
 
     # Funds Raised and Career Stability
-    if data['Funds_Raised(m)'] < 1000000:
+    if data['Funds_Raised(m)'] < 10000:
         advice.append("If your company has raised limited funds, consider discussing long-term stability and potential career opportunities with your manager to ensure your future security.")
 
     # Gender: Gender-Specific Advice (if needed)
