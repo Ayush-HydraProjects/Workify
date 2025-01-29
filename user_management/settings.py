@@ -30,7 +30,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["workifymac.onrender.com", "localhost"]
+ALLOWED_HOSTS = ["workify-9i2l.onrender.com", "localhost"]
 
 
 # Application definition
